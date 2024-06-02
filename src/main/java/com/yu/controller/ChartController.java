@@ -49,7 +49,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class ChartController {
 
     @Resource
-    private YucongmingAiManager aiManager;
+    private YucongmingAiManager yuAiManager;
 
     @Resource
     private ChartService chartService;
@@ -266,7 +266,7 @@ public class ChartController {
         String csvData = ExcelUtils.excelToCsv(multipartFile);
         userInput.append(csvData).append("\n");
 
-        String result = aiManager.doChat(biModelId, userInput.toString());
+        String result = yuAiManager.doChat(biModelId, userInput.toString());
         String[] splits = result.split("【【【【【");
         if (splits.length < 3) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "AI 生成错误");
@@ -463,7 +463,7 @@ public class ChartController {
                 return;
             }
             // 调用 AI
-            String result = aiManager.doChat(biModelId, userInput.toString());
+            String result = yuAiManager.doChat(biModelId, userInput.toString());
             String[] splits = result.split("【【【【【");
             if (splits.length < 3) {
                 handleChartUpdateError(chart.getId(), "AI 生成错误");
@@ -530,7 +530,7 @@ public class ChartController {
 //         2号,20
 //         3号,30
 
-        String result = aiManager.doChat(biModelId, content.toString());
+        String result = yuAiManager.doChat(biModelId, content.toString());
         String[] splits = result.split("【【【【【");
         if (splits.length < 3) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "AI 生成错误");

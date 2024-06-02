@@ -145,6 +145,12 @@
             <artifactId>amqp-client</artifactId>
             <version>5.17.0</version>
         </dependency>
+        <!--zhipu AI-->
+        <dependency>
+            <groupId>cn.bigmodel.openapi</groupId>
+            <artifactId>oapi-java-sdk</artifactId>
+            <version>release-V4-2.0.2</version>
+        </dependency>
     </dependencies>
 
     <build>
