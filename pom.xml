@@ -151,6 +151,12 @@
             <artifactId>oapi-java-sdk</artifactId>
             <version>release-V4-2.0.2</version>
         </dependency>
+        <!--大淘客SDK-本地引入-->
+        <dependency>
+            <groupId>com.dtk</groupId>
+            <artifactId>openapi_SDK</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>

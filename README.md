@@ -89,6 +89,22 @@
 
 #### 答题
 
+### 商城模块
+
+每日爆品推荐api，https://www.dataoke.com/pmc/api-d.html?id=34
+
+1.程序引入SDK
+
+IDEA：file-new-project from existing sources...
+
+2.配置api密钥
+```yaml
+dataoke:
+  appKey: 665ed....
+  appSecret: d30d....
+
+```
+
 ## 数据删除逻辑
 
 1.字段为 isDelete 的默认为逻辑删除
