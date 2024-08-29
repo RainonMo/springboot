@@ -161,3 +161,31 @@ create table if not exists user_answer
     index idx_appId (appId),
     index idx_userId (userId)
     ) comment '用户答题记录' collate = utf8mb4_unicode_ci;
+
+-- 模版表
+create table if not exists demo
+(
+    id           bigint auto_increment comment 'id' primary key,
+    `name`               varchar(128) null comment '图表名称',
+    chartData    text  null comment '图表数据',
+    chartType	   varchar(128) null comment '图表类型',
+    userId       bigint null comment '创建用户 id',
+    createTime   datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime   datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete     tinyint      default 0                 not null comment '是否删除'
+    ) comment '模版表' collate = utf8mb4_unicode_ci;
+
+-- 导航表
+create table if not exists nav
+(
+    id           bigint auto_increment comment 'id' primary key,
+    `name`               varchar(128) null comment '名称',
+    url               varchar(1024) null comment '地址',
+    icon               varchar(1024) null comment '图像',
+    profile               varchar(1024) null comment '简洁',
+    category               varchar(128) null comment '分类',
+    userId       bigint null comment '创建用户 id',
+    createTime   datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime   datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete     tinyint      default 0                 not null comment '是否删除'
+    ) comment '导航表' collate = utf8mb4_unicode_ci;

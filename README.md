@@ -1,6 +1,25 @@
 # myworld-backend
 一个集导航、博客、商城等功能的平台。
 
+## 技术栈
+
++ springboot 2.7.2
++ mybatis-plus 3.5.2
+
+### 数据存储
+
++ MySQL 数据库
++ Redis 内存数据库
++ Elasticsearch 搜索引擎
++ 腾讯云 COS 对象存储
+
+### 工具类
+
++ Easy Excel 表格处理
++ Hutool 工具库
++ Apache Commons Lang3 工具类
++ Lombok 注解
+
 ## 运行
 
 1.添加数据库表
@@ -12,6 +31,7 @@
 4.打开api接口文档测试
 
 5.运行前端
+
 
 ## 目录结构
 
@@ -156,6 +176,75 @@ mybatis-plus:
      */
     private Integer is_deleted;
 ```
+
+
+## 开发模版
+
+### 模版一,生成controller、servece、dto、vo
+
+1.在generate包的CodeGenerator,填写中文名称，大写名称，小写名称，模块名称。
+2.移动生成的generator包的文件夹到相对于的文件。
+3.检查对应类的import是否正确，替换快捷键Ctrl+shift+R。
+4.根据业务完善逻辑。
+
+### 工具，生成entity、mapper
+
+1.设计数据库表。
+2.安装插件。
+3.连接数据库，使用插件生成。
+4.移动生成的文件到对应的文件。
+
+## 打包
+
+```bash
+
+mvn package -DskipTests
+
+```
+
+
+## 部署
+
+### 本地部署
+
+```bash
+
+java -jar myworld-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
+
+```
+
+### docker部署
+
+所需文件
+
+x.jar
+
+Dockerfile
+
+``` xml
+
+FROM maven:3.8.1-jdk-8-slim as builder
+
+WORKDIR /app
+COPY myworld-0.0.4-SNAPSHOT.jar .
+CMD ["java","-jar","/app/myworld-0.0.4-SNAPSHOT.jar","--spring.profiles.active=prod"]
+
+```
+
+```bash
+docker build -t myworld:v1 .
+
+docker run -it -p 8000:8000 --name myworldv1 -d myworld:v1
+```
+
+
+
+
+
+
+
+
+
 
 
 

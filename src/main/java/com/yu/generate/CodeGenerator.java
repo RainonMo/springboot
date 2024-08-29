@@ -28,10 +28,10 @@ public class CodeGenerator {
     public static void main(String[] args) throws TemplateException, IOException {
         // 指定生成参数
         String packageName = "com.yu";
-        String dataName = "应用";
-        String dataKey = "app";
-        String upperDataKey = "App";
-        String moduleName = "dati";
+        String dataName = "导航";
+        String dataKey = "nav";
+        String upperDataKey = "Nav";
+        String moduleName = "nav";
 
         // 封装生成参数
         Map<String, Object> dataModel = new HashMap<>();
