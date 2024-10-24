@@ -189,3 +189,28 @@ create table if not exists nav
     updateTime   datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
     isDelete     tinyint      default 0                 not null comment '是否删除'
     ) comment '导航表' collate = utf8mb4_unicode_ci;
+
+-- 消息表
+create table if not exists message
+(
+    id           bigint auto_increment comment 'id' primary key,
+    `content` text COMMENT '内容',
+    `productId` bigint NOT NULL COMMENT '产品id',
+    `timeId` bigint NOT NULL COMMENT '时间id',
+    userId       bigint null comment '创建用户 id',
+    createTime   datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime   datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete     tinyint      default 0                 not null comment '是否删除'
+    ) comment '消息表' collate = utf8mb4_unicode_ci;
+
+-- 用户时间配置表
+create table if not exists user_time_set
+(
+    id           bigint auto_increment comment 'id' primary key,
+    `cron` text COMMENT '时间配置',
+    `productId` bigint NOT NULL COMMENT '产品id',
+    userId       bigint null comment '创建用户 id',
+    createTime   datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime   datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete     tinyint      default 0                 not null comment '是否删除'
+) comment '用户时间配置表' collate = utf8mb4_unicode_ci;

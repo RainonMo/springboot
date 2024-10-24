@@ -10,13 +10,11 @@ import com.yu.config.WxOpenConfig;
 import com.yu.constant.UserConstant;
 import com.yu.exception.BusinessException;
 import com.yu.exception.ThrowUtils;
-import com.yu.model.dto.user.UserAddRequest;
-import com.yu.model.dto.user.UserLoginRequest;
-import com.yu.model.dto.user.UserQueryRequest;
-import com.yu.model.dto.user.UserRegisterRequest;
-import com.yu.model.dto.user.UserUpdateMyRequest;
-import com.yu.model.dto.user.UserUpdateRequest;
+import com.yu.model.dto.message.MessageAddRequest;
+import com.yu.model.dto.user.*;
+import com.yu.model.entity.Message;
 import com.yu.model.entity.User;
+import com.yu.model.entity.UserTimeSet;
 import com.yu.model.vo.LoginUserVO;
 import com.yu.model.vo.UserVO;
 import com.yu.service.UserService;
@@ -26,6 +24,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.yu.service.UserTimeSetService;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import me.chanjar.weixin.common.bean.oauth2.WxOAuth2AccessToken;
@@ -52,6 +51,9 @@ public class UserController {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private UserTimeSetService userTimeSetService;
 
     @Resource
     private WxOpenConfig wxOpenConfig;
@@ -319,4 +321,20 @@ public class UserController {
     public BaseResponse<String> test(){
         return ResultUtils.success("hello world");
     }
+
+    @PostMapping("/setTime")
+    public BaseResponse<Long> sendTime(@RequestBody UserTimeAddRequest userTimeAddRequest, HttpServletRequest request){
+        ThrowUtils.throwIf(userTimeAddRequest==null, ErrorCode.PARAMS_ERROR);
+        UserTimeSet userTimeSet = new UserTimeSet();
+        BeanUtils.copyProperties(userTimeAddRequest,userTimeSet);
+        //参数校验 todo
+//        messageService.validMessage(message,true);
+        User loginUser = userService.getLoginUser(request);
+        userTimeSet.setUserId(loginUser.getId());
+        boolean result = userTimeSetService.save(userTimeSet);
+        ThrowUtils.throwIf(!result,ErrorCode.OPERATION_ERROR);
+        Long newTimeId = userTimeSet.getId();
+        return ResultUtils.success(newTimeId);
+    }
+
 }

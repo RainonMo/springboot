@@ -125,6 +125,12 @@ dataoke:
 
 ```
 
+### 生活管家
+
+定时任务
+https://blog.csdn.net/qianlixiaomage/article/details/106599951
+https://www.jianshu.com/p/3ea233e4d93e
+
 ## 数据删除逻辑
 
 1.字段为 isDelete 的默认为逻辑删除
