@@ -13,4 +13,8 @@
     <sql id="Base_Column_List">
         id,article_id,category_id
     </sql>
+
+    <delete id="removeByArticleId" parameterType="long">
+        delete from t_article_category_rel where article_id = #{id};
+    </delete>
 </mapper>

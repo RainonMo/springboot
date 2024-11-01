@@ -13,6 +13,7 @@ import com.yu.constant.CommonConstant;
 import com.yu.constant.UserConstant;
 import com.yu.exception.BusinessException;
 import com.yu.exception.ThrowUtils;
+import com.yu.manager.AiManager;
 import com.yu.manager.RedisLimiterManager;
 import com.yu.manager.YucongmingAiManager;
 import com.yu.model.dto.chart.ChartAddRequest;
@@ -65,6 +66,9 @@ public class ChartController {
 
     @Resource
     private ThreadPoolExecutor threadPoolExecutor;
+
+    @Resource
+    private AiManager aiManager;
 
     // region 增删改查
 
@@ -266,8 +270,14 @@ public class ChartController {
         String csvData = ExcelUtils.excelToCsv(multipartFile);
         userInput.append(csvData).append("\n");
 
-        String result = yuAiManager.doChat(biModelId, userInput.toString());
+        //更换智谱ai
+        String result = aiManager.doSyncRequest(GENERATE_QUESTION_SYSTEM_MESSAGE, userInput.toString(), null);
+        System.out.println("结果："+result);
+//        String result = yuAiManager.doChat(biModelId, userInput.toString());
         String[] splits = result.split("【【【【【");
+        for (int i = 0; i < splits.length; i++) {
+            System.out.println("第"+i+"个："+splits[i]);
+        }
         if (splits.length < 3) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "AI 生成错误");
         }
@@ -281,6 +291,7 @@ public class ChartController {
         chart.setChartType(chartType);
         chart.setGenChart(genChart);
         chart.setGenResult(genResult);
+        chart.setStatus("succeed");
         chart.setUserId(loginUser.getId());
         boolean saveResult = chartService.save(chart);
         ThrowUtils.throwIf(!saveResult, ErrorCode.SYSTEM_ERROR, "图表保存失败");
@@ -290,6 +301,20 @@ public class ChartController {
         biResponse.setChartId(chart.getId());
         return ResultUtils.success(biResponse);
     }
+
+    static String demo ="{\"xAxis\":{\"type\":\"category\",\"data\":[\"整数\",\"字符串\",\"小数\",\"日期\"]},\"yAxis\":{\"type\":\"value\"},\"series\":[{\"data\":[1,null,1.2,null],\"type\":\"line\"}]";
+
+    // region AI 生成题目功能
+    private static final String GENERATE_QUESTION_SYSTEM_MESSAGE = "你是一个数据分析师和前端开发专家，接下来我会按照以下固定格式给你提供内容：\n"+
+            "分析需求：\n"+
+            "{数据分析的需求或者目标}"+
+            "原始数据：\n"+
+            "{csv 格式的原始数据，用,作为分隔符}\n"+
+            "请根据这两部分内容，按照以下指定格式生成内容（此外不要输出任何多余的开头、结尾、注释）\n"+
+            "【【【【【\n"+
+            "{前端 Echarts V5 的 option 配置对象 js 代码，合理地将数据进行可视化，不要生成任何多余的内容，比如："+demo+"}\n"+
+            "【【【【【\n"+
+            "{明确的数据分析结论、越详细越好，不要生成多余的注释}";
 
     /**
      * 智能分析（异步消息队列）
@@ -462,7 +487,7 @@ public class ChartController {
                 handleChartUpdateError(chart.getId(), "更新图表执行中状态失败");
                 return;
             }
-            // 调用 AI
+            // 调用 AI TODO
             String result = yuAiManager.doChat(biModelId, userInput.toString());
             String[] splits = result.split("【【【【【");
             if (splits.length < 3) {

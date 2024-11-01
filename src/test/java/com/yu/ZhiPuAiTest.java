@@ -35,6 +35,9 @@ public class ZhiPuAiTest {
                 .messages(messages)
                 .build();
         ModelApiResponse invokeModelApiResp = clientV4.invokeModelApi(chatCompletionRequest);
-        System.out.println("model output:" + invokeModelApiResp.getData().getChoices().get(0));
+        System.out.println("model output:" + invokeModelApiResp.getData().getChoices().get(0).getMessage().getContent());
+        System.out.println("model output1:" + invokeModelApiResp.getData());
     }
+
+
 }

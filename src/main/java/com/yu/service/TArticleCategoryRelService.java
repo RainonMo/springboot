@@ -10,4 +10,5 @@ import com.yu.model.entity.TArticleCategoryRel;
 */
 public interface TArticleCategoryRelService extends IService<TArticleCategoryRel> {
 
+    boolean removeByArticleId(long id);
 }

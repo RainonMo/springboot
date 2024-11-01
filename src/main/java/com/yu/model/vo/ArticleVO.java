@@ -46,7 +46,7 @@ public class ArticleVO implements Serializable {
     /**
      * 被阅读次数
      */
-    private Object read_num;
+    private Integer read_num;
 
     /**
      * 点赞数
@@ -67,6 +67,11 @@ public class ArticleVO implements Serializable {
      * 分类id
      */
     private Long categoryId;
+
+    /**
+     * 分类名称
+     */
+    private String categoryName;
 
     private static final long serialVersionUID = 1L;
 }

@@ -11,6 +11,7 @@ import com.yu.model.entity.TArticleCategoryRel;
 */
 public interface TArticleCategoryRelMapper extends BaseMapper<TArticleCategoryRel> {
 
+    boolean removeByArticleId(long id);
 }
 
 

@@ -52,7 +52,7 @@ public class BlogController {
     private TArticleContentService tarticleContentService;
 
     @Resource
-    private TArticleCategoryRelService taricleCategoryRelService;
+    private TArticleCategoryRelService tarticleCategoryRelService;
 
     @Resource
     private UserService userService;
@@ -130,6 +130,23 @@ public class BlogController {
     }
 
     /**
+     * 分页获取分类列表（仅管理员可用）
+     *
+     * @param tCategoryQueryRequest
+     * @return
+     */
+    @PostMapping("/tcategory/list/page")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Page<TCategory>> listTCategoryByPage(@RequestBody TCategoryQueryRequest tCategoryQueryRequest) {
+        long current = tCategoryQueryRequest.getCurrent();
+        long size = tCategoryQueryRequest.getPageSize();
+        // 查询数据库
+        Page<TCategory> tcategoryPage = tcategoryService.page(new Page<>(current, size),
+                tcategoryService.getQueryWrapper(tCategoryQueryRequest));
+        return ResultUtils.success(tcategoryPage);
+    }
+
+    /**
      * 仅管理员根据 id 获取分类
      *
      * @param id
@@ -198,7 +215,7 @@ public class BlogController {
             //select * from t_article_category_rel where category_id = ? 根据分类id查询相关文章id
             QueryWrapper<TArticleCategoryRel> wrapperTArticleCategoryRel = new QueryWrapper<>();
             wrapperTArticleCategoryRel.eq( category_id.getId() != null,"category_id", category_id.getId());
-            List<TArticleCategoryRel> tArticleCategoryRels = taricleCategoryRelService.list(wrapperTArticleCategoryRel);
+            List<TArticleCategoryRel> tArticleCategoryRels = tarticleCategoryRelService.list(wrapperTArticleCategoryRel);
             // 判断该分类下是否存在文章
             if (CollectionUtils.isEmpty(tArticleCategoryRels)){
 //            Page<ArticleVO> page = tarticleService.page(new Page<>(current, size));
@@ -255,7 +272,7 @@ public class BlogController {
         TArticleCategoryRel tarticleCategoryRel = new TArticleCategoryRel();
         tarticleCategoryRel.setArticle_id(tarticleId);
         tarticleCategoryRel.setCategory_id(tarticleAddRequest.getCategoryId());
-        boolean saveArticleCategoryRel = taricleCategoryRelService.save(tarticleCategoryRel);
+        boolean saveArticleCategoryRel = tarticleCategoryRelService.save(tarticleCategoryRel);
         ThrowUtils.throwIf(!saveArticleCategoryRel,ErrorCode.OPERATION_ERROR);
 
         return ResultUtils.success(tarticleId);
@@ -291,6 +308,13 @@ public class BlogController {
         TArticleContent taricleContent = tarticleContentService.getOne(queryTArticleContent);
         boolean removeById = tarticleContentService.removeById(taricleContent.getId());
         ThrowUtils.throwIf(!removeById,ErrorCode.OPERATION_ERROR);
+        // 删除文章分类
+//        // select * from t_article_content where article_id = ?
+//        QueryWrapper<TArticleContent> queryTArticleContent = new QueryWrapper<>();
+//        queryTArticleContent.eq("article_id",id);
+//        TArticleContent taricleContent = tarticleContentService.getOne(queryTArticleContent);
+        boolean removeByArticleId = tarticleCategoryRelService.removeByArticleId(id);
+        ThrowUtils.throwIf(!removeByArticleId,ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(b);
     }
 
@@ -329,7 +353,24 @@ public class BlogController {
     }
 
     /**
-     * 根据 id 获取 todo
+     * 分页获取文章列表（仅管理员可用） todo
+     *
+     * @param TArticleQueryRequest
+     * @return
+     */
+    @PostMapping("/tarticle/list/page")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Page<TArticle>> listTArticleByPage(@RequestBody TArticleQueryRequest TArticleQueryRequest) {
+        long current = TArticleQueryRequest.getCurrent();
+        long size = TArticleQueryRequest.getPageSize();
+        // 查询数据库
+        Page<TArticle> tArticlePage = tarticleService.page(new Page<>(current, size),
+                getTArticleQueryWrapper(TArticleQueryRequest));
+        return ResultUtils.success(tArticlePage);
+    }
+
+    /**
+     * 根据 id 获取
      *
      * @param id
      * @return
@@ -350,7 +391,18 @@ public class BlogController {
         queryArticleContent.eq("article_id",articleVO.getId());
         TArticleContent tarticleContentServiceOne = tarticleContentService.getOne(queryArticleContent);
         articleVO.setContent(tarticleContentServiceOne.getContent());
-        //所属分类 todo
+        //所属分类
+        //select *  from t_article_category_rel where article_id = ?
+        QueryWrapper<TArticleCategoryRel> queryArticleCategoryRel = new QueryWrapper<>();
+        queryArticleCategoryRel.eq("article_id",articleVO.getId());
+        //List<TArticleCategoryRel> tArticleCategoryRelLists = tarticleCategoryRelService.list(queryArticleCategoryRel);
+        TArticleCategoryRel tarticleCategoryRelServiceOne = tarticleCategoryRelService.getOne(queryArticleCategoryRel);
+        //分类名称
+        QueryWrapper<TCategory> queryCategory = new QueryWrapper<>();
+        queryCategory.eq("id",tarticleCategoryRelServiceOne.getCategory_id());
+        TCategory tcategoryServiceOne = tcategoryService.getOne(queryCategory);
+        articleVO.setCategoryId(tcategoryServiceOne.getId());
+        articleVO.setCategoryName(tcategoryServiceOne.getName());
 
         return ResultUtils.success(articleVO);
     }
@@ -385,13 +437,14 @@ public class BlogController {
         }
 
         Long userId = tarticleQueryRequest.getUserId();
+        String title = tarticleQueryRequest.getTitle();
         String sortField = tarticleQueryRequest.getSortField();
         String sortOrder = tarticleQueryRequest.getSortOrder();
 
+        queryWrapper.like(StringUtils.isNotBlank(title),"title",title);
         queryWrapper.eq(ObjectUtils.isNotEmpty(userId), "userId", userId);
         queryWrapper.eq("is_deleted", false);
-        queryWrapper.orderBy(SqlUtils.validSortField(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC),
-                sortField);
+        queryWrapper.orderBy(SqlUtils.validSortField(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC), sortField);
 
         return queryWrapper;
     }

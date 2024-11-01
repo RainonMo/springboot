@@ -120,19 +120,34 @@ public class NavController {
     }
 
     /**
-     * 根据 id 获取导航（封装类）
+     * 编辑导航（给用户使用）
      *
-     * @param id
+     * @param navEditRequest
+     * @param request
      * @return
      */
-    @GetMapping("/get/vo")
-    public BaseResponse<NavVO> getNavVOById(long id, HttpServletRequest request) {
-        ThrowUtils.throwIf(id <= 0, ErrorCode.PARAMS_ERROR);
-        // 查询数据库
-        Nav nav = navService.getById(id);
-        ThrowUtils.throwIf(nav == null, ErrorCode.NOT_FOUND_ERROR);
-        // 获取封装类
-        return ResultUtils.success(navService.getNavVO(nav, request));
+    @PostMapping("/edit")
+    public BaseResponse<Boolean> editNav(@RequestBody NavEditRequest navEditRequest, HttpServletRequest request) {
+        if (navEditRequest == null || navEditRequest.getId() <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        Nav nav = new Nav();
+        BeanUtils.copyProperties(navEditRequest, nav);
+        // 数据校验
+        navService.validNav(nav, false);
+        User loginUser = userService.getLoginUser(request);
+        // 判断是否存在
+        long id = navEditRequest.getId();
+        Nav oldNav = navService.getById(id);
+        ThrowUtils.throwIf(oldNav == null, ErrorCode.NOT_FOUND_ERROR);
+        // 仅本人或管理员可编辑
+        if (!oldNav.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
+        }
+        // 操作数据库
+        boolean result = navService.updateById(nav);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
+        return ResultUtils.success(true);
     }
 
     /**
@@ -199,34 +214,19 @@ public class NavController {
     }
 
     /**
-     * 编辑导航（给用户使用）
+     * 根据 id 获取导航（封装类）
      *
-     * @param navEditRequest
-     * @param request
+     * @param id
      * @return
      */
-    @PostMapping("/edit")
-    public BaseResponse<Boolean> editNav(@RequestBody NavEditRequest navEditRequest, HttpServletRequest request) {
-        if (navEditRequest == null || navEditRequest.getId() <= 0) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        Nav nav = new Nav();
-        BeanUtils.copyProperties(navEditRequest, nav);
-        // 数据校验
-        navService.validNav(nav, false);
-        User loginUser = userService.getLoginUser(request);
-        // 判断是否存在
-        long id = navEditRequest.getId();
-        Nav oldNav = navService.getById(id);
-        ThrowUtils.throwIf(oldNav == null, ErrorCode.NOT_FOUND_ERROR);
-        // 仅本人或管理员可编辑
-        if (!oldNav.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
-            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
-        }
-        // 操作数据库
-        boolean result = navService.updateById(nav);
-        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
-        return ResultUtils.success(true);
+    @GetMapping("/get/vo")
+    public BaseResponse<NavVO> getNavVOById(long id, HttpServletRequest request) {
+        ThrowUtils.throwIf(id <= 0, ErrorCode.PARAMS_ERROR);
+        // 查询数据库
+        Nav nav = navService.getById(id);
+        ThrowUtils.throwIf(nav == null, ErrorCode.NOT_FOUND_ERROR);
+        // 获取封装类
+        return ResultUtils.success(navService.getNavVO(nav, request));
     }
 
     // endregion

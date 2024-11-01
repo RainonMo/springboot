@@ -1,7 +1,8 @@
 package com.yu.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.yu.common.BaseResponse;
+import com.yu.model.dto.tcategory.TCategoryQueryRequest;
 import com.yu.model.entity.TCategory;
 
 /**
@@ -11,4 +12,5 @@ import com.yu.model.entity.TCategory;
 */
 public interface TCategoryService extends IService<TCategory> {
 
+    QueryWrapper<TCategory> getQueryWrapper(TCategoryQueryRequest tCategoryQueryRequest);
 }
