@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -353,20 +354,31 @@ public class BlogController {
     }
 
     /**
-     * 分页获取文章列表（仅管理员可用） todo
+     * 分页获取文章列表（仅管理员可用）
      *
-     * @param TArticleQueryRequest
+     * @param tArticleQueryRequest
      * @return
      */
     @PostMapping("/tarticle/list/page")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
-    public BaseResponse<Page<TArticle>> listTArticleByPage(@RequestBody TArticleQueryRequest TArticleQueryRequest) {
-        long current = TArticleQueryRequest.getCurrent();
-        long size = TArticleQueryRequest.getPageSize();
+    public BaseResponse<Page<TArticle>> listTArticleByPage(@RequestBody TArticleQueryRequest tArticleQueryRequest) {
+        long current = tArticleQueryRequest.getCurrent();
+        long size = tArticleQueryRequest.getPageSize();
         // 查询数据库
         Page<TArticle> tArticlePage = tarticleService.page(new Page<>(current, size),
-                getTArticleQueryWrapper(TArticleQueryRequest));
+                getTArticleQueryWrapper(tArticleQueryRequest));
         return ResultUtils.success(tArticlePage);
+    }
+
+    @PostMapping("/tarticle/list")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<HashMap<String,Object>> listTArticle(@RequestBody TArticleQueryRequest tArticleQueryRequest) {
+        List<ArticleVO> data = tarticleService.listTArticle(tArticleQueryRequest);
+        Long count = tarticleService.getTArticleVOCount(tArticleQueryRequest);
+        HashMap<String, Object> res = new HashMap<>();
+        res.put("records",data);
+        res.put("total",count);
+        return ResultUtils.success(res);
     }
 
     /**

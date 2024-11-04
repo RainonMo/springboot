@@ -24,4 +24,17 @@
         update_time,is_deleted,read_num,
         thumbNum,favourNum
     </sql>
+
+    <!--获取文章数据-->
+    <select id="listTArticle" resultType="com.yu.model.vo.ArticleVO">
+        SELECT a.id,a.title,a.description,ac.content,a.create_time,a.update_time,
+               (SELECT name FROM t_category a WHERE a.id=acr.category_id)categoryName,
+               acr.category_id categoryId
+        FROM t_article a
+                 LEFT JOIN t_article_content ac on ac.article_id = a.id
+                 LEFT JOIN t_article_category_rel acr on acr.article_id=a.id
+        WHERE a.title like CONCAT('%',#{title},'%')
+
+        LIMIT #{current},#{pageSize}
+    </select>
 </mapper>
